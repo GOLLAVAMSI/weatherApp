@@ -14,8 +14,6 @@ const humidityEl = document.querySelector(".humidity");
 const windEl = document.querySelector(".wind");
 const iconEl = document.querySelector(".weather .icon");
 const descEl = document.querySelector('.desc');
-const sunriseEl = document.querySelector('.sunrise');
-const sunsetEl = document.querySelector('.sunset');
 
 function mapConditionToIcon(main, desc) {
     const key = (main || "").toLowerCase();
@@ -38,13 +36,6 @@ function mapIconCodeToFile(iconCode) {
     if (code.startsWith('13')) return 'snow.svg';
     if (code.startsWith('50')) return 'mist.svg';
     return null;
-}
-
-function formatTimeUnix(ts, tzOffset) {
-    if (!ts) return '--:--';
-    // tzOffset is in seconds from UTC
-    const date = new Date((ts + (tzOffset || 0)) * 1000);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 async function fetchWeatherByCity(city) {
@@ -83,9 +74,6 @@ function updateUI(data) {
     windEl.textContent = `${windKmh} km/h`;
     const w = data.weather && data.weather[0] ? data.weather[0] : { main: '', description: '', icon: '' };
     if (descEl) descEl.textContent = w.description || w.main || '';
-    const tz = data.timezone || 0;
-    if (sunriseEl && data.sys && data.sys.sunrise) sunriseEl.textContent = formatTimeUnix(data.sys.sunrise, tz);
-    if (sunsetEl && data.sys && data.sys.sunset) sunsetEl.textContent = formatTimeUnix(data.sys.sunset, tz);
     // choose icon by icon code first, then fallback to condition
     const iconByCode = mapIconCodeToFile(w.icon);
     const iconFile = iconByCode || mapConditionToIcon(w.main, w.description);
