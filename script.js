@@ -1,0 +1,89 @@
+
+/* Weather fetch and UI update script
+   - Uses OpenWeatherMap current weather API (metric units)
+   - Replaces placeholder API key with the provided key
+   - Maps weather conditions to local SVG icons in /images
+*/
+
+const API_KEY = "977029aaff1b37ed877884bc2e2a7f53";
+const BASE_URL = "https://api.openweathermap.org/data/2.5/weather?units=metric";
+
+// DOM elements
+const searchBox = document.querySelector(".search input");
+const searchBtn = document.querySelector(".search button");
+const cityEl = document.querySelector(".city");
+const tempEl = document.querySelector(".temp");
+const humidityEl = document.querySelector(".humidity");
+const windEl = document.querySelector(".wind");
+const iconEl = document.querySelector(".weather .icon");
+
+function mapConditionToIcon(main, desc) {
+    const key = (main || "").toLowerCase();
+    if (key.includes("clear")) return "clear.svg";
+    if (key.includes("cloud")) return "cloudy.svg";
+    if (key.includes("rain") || key.includes("drizzle")) return "rain.svg";
+    if (key.includes("snow")) return "snow.svg";
+    if (key.includes("thunder")) return "thunder.svg";
+    if (key.includes("mist") || key.includes("fog") || key.includes("haze")) return "mist.svg";
+    return "cloudy.svg"; // fallback
+}
+
+async function fetchWeatherByCity(city) {
+    if (!city) return showError('Please enter a city name.');
+    try {
+        const res = await fetch(`${BASE_URL}&q=${encodeURIComponent(city)}&appid=${API_KEY}`);
+        if (!res.ok) throw new Error('Location not found');
+        const data = await res.json();
+        updateUI(data);
+    } catch (err) {
+        showError(err.message || 'Failed to fetch weather');
+        console.error(err);
+    }
+}
+
+async function fetchWeatherByCoords(lat, lon) {
+    try {
+        const res = await fetch(`${BASE_URL}&lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+        if (!res.ok) throw new Error('Location not found');
+        const data = await res.json();
+        updateUI(data);
+    } catch (err) {
+        showError(err.message || 'Failed to fetch weather');
+        console.error(err);
+    }
+}
+
+function updateUI(data) {
+    if (!data || !data.main) return showError('Invalid data');
+    cityEl.textContent = `${data.name}${data.sys && data.sys.country ? ', ' + data.sys.country : ''}`;
+    tempEl.textContent = `${Math.round(data.main.temp)}°c`;
+    humidityEl.textContent = `${data.main.humidity}%`;
+    windEl.textContent = `${data.wind && data.wind.speed ? data.wind.speed : '--'} km/h`;
+    const w = data.weather && data.weather[0] ? data.weather[0] : { main: '' };
+    const iconFile = mapConditionToIcon(w.main, w.description);
+    if (iconEl) iconEl.src = `images/${iconFile}`;
+}
+
+function showError(message) {
+    cityEl.textContent = message;
+    tempEl.textContent = '--°c';
+    humidityEl.textContent = '--%';
+    windEl.textContent = '-- km/h';
+}
+
+// Event handlers
+searchBtn.addEventListener('click', () => fetchWeatherByCity(searchBox.value));
+searchBox.addEventListener('keydown', (e) => { if (e.key === 'Enter') fetchWeatherByCity(searchBox.value); });
+
+// On load: try geolocation, otherwise fallback to a default city
+window.addEventListener('load', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+            fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
+        }, () => {
+            fetchWeatherByCity('London');
+        });
+    } else {
+        fetchWeatherByCity('London');
+    }
+});

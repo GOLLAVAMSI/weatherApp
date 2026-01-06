@@ -1,0 +1,138 @@
+
+/* style.css */
+/* These styles are common for weather apps and are not from the source */
+body {
+        /* Dark complementary background using existing aqua -> purple accents */
+        background:
+            radial-gradient(circle at 10% 10%, rgba(0,254,186,0.08), transparent 18%),
+            radial-gradient(circle at 90% 90%, rgba(91,84,138,0.06), transparent 25%),
+            linear-gradient(180deg, #071022 0%, #1b1230 55%, #5b548a 100%);
+        color: #e9eef8;
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+}
+
+.card {
+    width: 90%;
+    max-width: 470px;
+    background: linear-gradient(135deg, #00feba, #5b548a);
+    color: #fff;
+    margin: 100px auto 0;
+    border-radius: 20px;
+    padding: 40px 35px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(7,16,34,0.6);
+    border: 1px solid rgba(255,255,255,0.04);
+    backdrop-filter: blur(6px);
+}
+
+.search {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search input {
+    border: 0;
+    outline: 0;
+    background: #ebfffc;
+    color: #000;
+    padding: 10px 25px;
+    height: 60px;
+    border-radius: 30px;
+    flex: 1;
+    margin-right: 16px;
+    font-size: 25px;
+}
+
+.search button {
+    border: 0;
+    outline: 0;
+    background: #fff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+}
+
+/* Weather card content */
+.weather {
+    margin-top: 28px;
+}
+
+.weather .icon {
+    width: 120px;
+    height: auto;
+    display: block;
+    margin: 0 auto 12px;
+}
+
+.temp {
+    font-size: 64px;
+    margin: 6px 0;
+    font-weight: 600;
+}
+
+.city {
+    font-size: 20px;
+    margin: 0 0 12px;
+    opacity: 0.95;
+}
+
+.details {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 14px;
+}
+
+.details .col {
+    text-align: center;
+}
+
+.details p { 
+    margin: 4px 0;
+}
+
+/* Tablet styles (medium screens) */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .card {
+        max-width: 650px;
+        padding: 36px 30px;
+        margin-top: 60px;
+    }
+    .search input { font-size: 22px; height: 56px; }
+    .search button { width: 56px; height: 56px; }
+    .temp { font-size: 72px; }
+    .weather .icon { width: 140px; }
+}
+
+/* Mobile styles (small screens) */
+@media (max-width: 480px) {
+    body { padding: 12px 0; }
+    .card {
+        width: 95%;
+        margin: 24px auto 0;
+        padding: 20px;
+        border-radius: 16px;
+    }
+    .search { gap: 8px; }
+    .search input {
+        font-size: 18px;
+        height: 48px;
+        padding: 8px 16px;
+        margin-right: 8px;
+    }
+    .search button { width: 48px; height: 48px; }
+    .weather .icon { width: 84px; margin-bottom: 8px; }
+    .temp { font-size: 42px; }
+    .city { font-size: 16px; }
+    .details { flex-direction: column; gap: 8px; }
+}
+
+/* Utilities: make images and inputs scale nicely */
+img { max-width: 100%; height: auto; display: block; }
+input, button { -webkit-tap-highlight-color: rgba(0,0,0,0); }

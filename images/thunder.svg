@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128" aria-labelledby="title">
+  <title>Thunderstorm</title>
+  <path d="M18 30h28a10 10 0 0 0 0-20 14 14 0 0 0-27-2A8 8 0 0 0 10 24a8 8 0 0 0 8 6z" fill="#78909C"/>
+  <polygon points="30,38 38,38 34,50 42,42 30,42 34,30" fill="#FFD54F"/>
+</svg>
