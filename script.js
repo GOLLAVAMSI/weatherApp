@@ -5,9 +5,6 @@
    - Maps weather conditions to local SVG icons in /images
 */
 
-const API_KEY = "977029aaff1b37ed877884bc2e2a7f53";
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather?units=metric";
-
 // DOM elements
 const searchBox = document.querySelector(".search input");
 const searchBtn = document.querySelector(".search button");
@@ -31,7 +28,7 @@ function mapConditionToIcon(main, desc) {
 async function fetchWeatherByCity(city) {
     if (!city) return showError('Please enter a city name.');
     try {
-        const res = await fetch(`${BASE_URL}&q=${encodeURIComponent(city)}&appid=${API_KEY}`);
+        const res = await fetch(`/api/getWeather?q=${encodeURIComponent(city)}`);
         if (!res.ok) throw new Error('Location not found');
         const data = await res.json();
         updateUI(data);
@@ -43,7 +40,7 @@ async function fetchWeatherByCity(city) {
 
 async function fetchWeatherByCoords(lat, lon) {
     try {
-        const res = await fetch(`${BASE_URL}&lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+        const res = await fetch(`/api/getWeather?lat=${lat}&lon=${lon}`);
         if (!res.ok) throw new Error('Location not found');
         const data = await res.json();
         updateUI(data);

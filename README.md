@@ -50,49 +50,89 @@ git commit -m "Initial commit"
 # create repository on GitHub (via web) and then:
 git branch -M main
 git remote add origin https://github.com/<your-username>/<repo-name>.git
-git push -u origin main
-```
+# Weather App
 
-**Deploy on GitHub Pages (simple)**
-Option A — Serve from `main` branch root (recommended for simple static sites):
-1. Push your project to GitHub (see commands above).
-2. In the repository on GitHub, go to `Settings` → `Pages` → `Build and deployment`.
-3. Under `Source`, select `Deploy from a branch`, choose `main` and folder `/ (root)` and save.
-4. After a minute, your site will be available at `https://<your-username>.github.io/<repo-name>/`.
+A small static weather app that fetches current weather from OpenWeatherMap and displays it with simple SVG icons. Designed to be responsive for desktop, tablet and mobile.
 
-Option B — Use `gh-pages` branch:
+**Files**
+- `index.html` — main markup
+- `style.css` — styles including responsive media queries
+- `script.js` — fetches weather (via Netlify proxy function) and updates UI
+- `images/` — SVG icons used for weather states
+
+**Overview**
+- The app fetches current weather using OpenWeatherMap's "Current Weather" API and displays temperature, humidity, wind, and an icon.
+- By default the app tries geolocation; fallback is a default city (London).
+
+**Prerequisites**
+- Modern browser
+- Internet access
+- (Optional) A local static server for testing (recommended) — Python or Node
+
+**Netlify: functions & API key (recommended)**
+- This repo includes a Netlify serverless function at `netlify/functions/getWeather.js` and a `netlify.toml` that rewrites `/api/*` to functions.
+- Instead of embedding your OpenWeatherMap key in `script.js`, set an environment variable in Netlify named `OWM_API_KEY` and the function will use it.
+
+How the client calls the function:
+- Client requests `/api/getWeather?q=London` or `/api/getWeather?lat=..&lon=..` and the function proxies to OpenWeatherMap.
+
+**Configure API Key (Netlify)**
+1. Push this repo to GitHub and connect it to Netlify (or deploy via Netlify CLI).
+2. On Netlify site dashboard → Site settings → Build & deploy → Environment, add `OWM_API_KEY` = your OpenWeatherMap key.
+
+Note: If you prefer not to use Netlify, you can still run the app with a client-side key (see "Run locally" below), but that exposes the key to users.
+
+**Run locally (simple)**
+- You can open `index.html` directly in a browser, but some browsers restrict fetch calls via `file://`. Recommended to run a local static server.
+
+PowerShell (Python 3):
 ```powershell
-# create gh-pages branch and push
-git checkout -b gh-pages
-git push origin gh-pages
-# then configure GitHub Pages to publish from 'gh-pages' branch
+# from project directory
+python -m http.server 8000
+# then open http://localhost:8000 in your browser
 ```
 
-Option C — Use GitHub Actions for CI/CD (recommended if you want a build step or to inject secrets):
-- Create an action that runs on push and deploys to GitHub Pages. You can store private values in repository Secrets and use them in workflows.
+Node (http-server):
+```powershell
+npm install -g http-server
+http-server -c-1
+# open the printed local URL
+```
 
-**Expose API key safely**
-- Client-side: Replace `API_KEY` in `script.js` — easy but publicly visible.
-- Safer: create a small serverless function (Netlify Functions, Vercel Serverless, or GitHub Actions workflow with secrets) to proxy requests so the key stays secret.
+Local testing of Netlify functions:
+- Install Netlify CLI and run `netlify dev` to serve functions locally and apply `/api/*` redirects:
+```powershell
+npm install -g netlify-cli
+netlify dev
+```
+
+**Deploy to Netlify (connect GitHub)**
+1. Go to https://app.netlify.com → Sites → "New site from Git".
+2. Choose GitHub and select repository `GOLLAVAMSI/weatherApp`.
+3. Branch: `main`, Build command: (leave blank), Publish directory: `/`.
+4. After site creation, add environment variable `OWM_API_KEY` in Site settings → Build & deploy → Environment.
+
+**Alternative hosting**
+- GitHub Pages, Vercel, Cloudflare Pages, and Surge can also host static sites. For serverless proxies, prefer Netlify, Vercel, or Cloudflare Functions.
 
 **Testing / Debugging**
 - Open DevTools (F12) to see `console.log` output from `script.js` and network requests.
 - If location permission is denied, type a city name and press Enter or click Search.
 
 **How it works (short)**
-1. `script.js` on load requests geolocation; if available, it fetches weather for coords.
+1. `script.js` on load requests geolocation; if available, it fetches weather using the Netlify function for coords.
 2. If geolocation fails, it fetches a default city (London).
 3. When you search, it fetches by city name.
 4. The response is parsed and the DOM updated: `city`, `temp`, `humidity`, `wind`, and the `images/*.svg` icon.
 
 **Next steps / improvements**
-- Move API calls server-side to protect the key.
 - Add unit toggle (Celsius/Fahrenheit).
 - Add caching/localStorage to reduce API calls.
+- Add automated deploy (Netlify already supports CI on push).
 
 ---
 If you want, I can:
 - Create a GitHub Actions workflow file for automatic deployment to Pages.
-- Add instructions and a script to keep the API key out of the client using a serverless proxy.
+- Add extra Netlify Functions (caching, forecast endpoint) or update the client to handle more conditions.
 - Add a `package.json` and an npm `deploy` script that uses `gh-pages`.
 
